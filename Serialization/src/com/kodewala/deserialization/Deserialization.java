@@ -18,5 +18,6 @@ public class Deserialization {
 		System.out.println("Balance: " + account.getBalance());
 		System.out.println("Account Type: " + account.getAccountType());
 		System.out.println("Branch Name: " + account.getBranchName());
+		ois.close();
 	}
 }
