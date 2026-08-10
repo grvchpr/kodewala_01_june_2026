@@ -12,7 +12,7 @@ class MyResource implements AutoCloseable {
 }
 
 public class Test {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		try (MyResource resource = new MyResource()) {
 			resource.work();
 		}
