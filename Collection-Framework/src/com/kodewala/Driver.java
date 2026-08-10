@@ -9,6 +9,11 @@ public class Driver {
 		names.add("Rahul");
 		names.add("Nirmal");
 		names.add("Rohit");
+
+		for (int index = 0; index < names.size(); index++) {
+			System.out.println(names.get(index));
+		}
+
 		for (String name : names) {
 			System.out.println(name);
 		}
