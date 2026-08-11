@@ -1,1 +1,26 @@
-/.metadata/
+
+# Eclipse workspace
+.metadata/
+
+# Eclipse project files (optional - ignore if you don't want them in Git)
+.settings/
+.project
+.classpath
+
+# Java compiled files
+bin/
+*.class
+target/
+
+# Maven
+.mvn/
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# IntelliJ IDEA
+.idea/
+*.iml
