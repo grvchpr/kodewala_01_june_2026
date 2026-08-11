@@ -1,4 +1,4 @@
-package com.kodewala;
+package com.kodewala.list;
 
 import java.util.ArrayList;
 
@@ -14,8 +14,8 @@ public class Driver {
 			System.out.println(names.get(index));
 		}
 
-		for (String name : names) {
-			System.out.println(name);
+		for (String namee : names) {
+			System.out.println(namee);
 		}
 
 	}
