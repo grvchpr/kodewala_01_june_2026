@@ -1,0 +1,44 @@
+<div class="form-page">
+
+  <div class="form-container">
+
+    <div class="form-header">
+
+      <h1>
+        {{ isEditMode
+            ? 'Edit Employee'
+            : 'Add Employee'
+        }}
+      </h1>
+
+
+      <button
+        type="button"
+        class="close-button"
+        (click)="cancel()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <app-employee-form
+
+      [employeeToEdit]="employeeToEdit"
+
+      (employeeCreated)="
+        onEmployeeCreated($event)
+      "
+
+      (employeeUpdated)="
+        onEmployeeUpdated($event)
+      "
+
+      (cancel)="cancel()">
+
+    </app-employee-form>
+
+  </div>
+
+</div>

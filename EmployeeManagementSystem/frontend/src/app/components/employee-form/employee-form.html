@@ -1,0 +1,171 @@
+<form
+  class="employee-form"
+  (ngSubmit)="saveEmployee()"
+  novalidate
+>
+
+  <!-- ERROR MESSAGE -->
+
+  @if (errorMessage) {
+
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+
+  }
+
+
+  <!-- EMPLOYEE NAME -->
+
+  <div class="form-group">
+
+    <label for="empName">
+      Employee Name
+    </label>
+
+    <input
+      id="empName"
+      type="text"
+      name="empName"
+      [(ngModel)]="employee.empName"
+      [value]="employee.empName"
+      (blur)="nameTouched = true"
+      placeholder="Enter employee name"
+    />
+
+    @if (isNameInvalid()) {
+
+      <div class="field-error">
+        Employee name is required.
+      </div>
+
+    }
+
+  </div>
+
+
+  <!-- EMAIL -->
+
+  <div class="form-group">
+
+    <label for="empEmail">
+      Email
+    </label>
+
+    <input
+      id="empEmail"
+      type="email"
+      name="empEmail"
+      [(ngModel)]="employee.empEmail"
+       [value]="employee.empEmail"
+      (blur)="emailTouched = true"
+      placeholder="Enter email"
+    />
+
+    @if (isEmailInvalid()) {
+
+      <div class="field-error">
+        Please enter a valid email address.
+      </div>
+
+    }
+
+  </div>
+
+
+  <!-- DEPARTMENT -->
+
+  <div class="form-group">
+
+    <label for="empDepartment">
+      Department
+    </label>
+
+    <input
+      id="empDepartment"
+      type="text"
+      name="empDepartment"
+      [(ngModel)]="employee.empDepartment"
+      [value]="employee.empDepartment"
+      (blur)="departmentTouched = true"
+      placeholder="Enter department"
+    />
+
+    @if (isDepartmentInvalid()) {
+
+      <div class="field-error">
+        Department is required.
+      </div>
+
+    }
+
+  </div>
+
+
+  <!-- SALARY -->
+
+  <div class="form-group">
+
+    <label for="empSalary">
+      Salary
+    </label>
+
+    <input
+      id="empSalary"
+      type="number"
+      name="empSalary"
+      [(ngModel)]="employee.empSalary"
+      [value]="employee.empSalary"
+      (blur)="salaryTouched = true"
+      min="1"
+    />
+
+    @if (isSalaryInvalid()) {
+
+      <div class="field-error">
+        Salary must be greater than 0.
+      </div>
+
+    }
+
+  </div>
+
+
+  <!-- BUTTONS -->
+
+  <div class="form-actions">
+
+    <button
+      type="button"
+      class="cancel-button"
+      (click)="cancelForm()"
+      [disabled]="isSaving"
+    >
+      Cancel
+    </button>
+
+
+    <button
+      type="submit"
+      class="save-button"
+      [disabled]="isSaving"
+    >
+
+      @if (isSaving) {
+
+        Saving...
+
+      } @else {
+
+        {{ isEditMode
+            ? 'Update Employee'
+            : 'Save Employee'
+        }}
+
+      }
+
+    </button>
+
+  </div>
+
+</form>

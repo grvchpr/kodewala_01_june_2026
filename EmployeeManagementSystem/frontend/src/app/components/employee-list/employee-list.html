@@ -1,0 +1,184 @@
+<div class="page">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Employee Management</h1>
+      <p>Manage your employees and their information</p>
+    </div>
+
+    <button type="button" class="add-button" routerLink="/employees/add">
+      <span>+</span>
+      Add Employee
+    </button>
+  </div>
+
+  <!-- SEARCH + FILTERS -->
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+
+      <input
+        type="text"
+        placeholder="Search employees..."
+        [(ngModel)]="searchText"
+        (input)="searchEmployees()"
+      />
+    </div>
+
+    <div class="filters">
+      <select [(ngModel)]="selectedDepartment" (change)="filterByDepartment()">
+        <option value="All">All Departments</option>
+
+        @for (department of departments; track department) {
+
+        <option [value]="department">{{ department }}</option>
+
+        }
+      </select>
+
+      <button type="button" class="sort-button" (click)="sortBySalary()">
+        Salary @if (salarySort === 'asc') { ↑ } @else if (salarySort === 'desc')
+        { ↓ } @else { ↕ }
+      </button>
+    </div>
+
+    <div class="employee-count">
+      {{ filteredEmployees.length }} @if (filteredEmployees.length === 1) {
+      Employee } @else { Employees }
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+
+  @if (isLoading) {
+
+  <!-- LOADING -->
+
+  <div class="loading-state">
+    <div class="spinner"></div>
+
+    <p>Loading employees...</p>
+  </div>
+
+  } @else if (errorMessage) {
+
+  <!-- ERROR -->
+
+  <div class="error-state">
+    <div class="error-icon">⚠️</div>
+
+    <h2>Something went wrong</h2>
+
+    <p>{{ errorMessage }}</p>
+
+    <button type="button" class="retry-button" (click)="retryLoadEmployees()">
+      Try Again
+    </button>
+  </div>
+
+  } @else if (employees.length === 0) {
+
+  <!-- NO EMPLOYEES -->
+
+  <div class="empty-state">
+    <div class="empty-icon">👥</div>
+
+    <h2>No employees found</h2>
+
+    <p>Add your first employee to get started.</p>
+
+    <button type="button" class="add-button" (click)="openAddEmployee()">
+      <span>+</span>
+      Add Employee
+    </button>
+  </div>
+
+  } @else if (filteredEmployees.length === 0) {
+
+  <!-- NO SEARCH RESULTS -->
+
+  <div class="empty-state">
+    <div class="empty-icon">🔍</div>
+
+    <h2>No matching employees</h2>
+
+    <p>Try searching by name, email, or department.</p>
+  </div>
+
+  } @else {
+
+  <!-- EMPLOYEE TABLE -->
+
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employee</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Salary</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (employee of filteredEmployees; track employee.empId) {
+
+          <tr>
+            <td>
+              <span class="employee-id"> #{{ employee.empId }} </span>
+            </td>
+
+            <td>
+              <div class="employee-info">
+                <div class="avatar">
+                  {{ employee.empName.charAt(0).toUpperCase() }}
+                </div>
+
+                <strong> {{ employee.empName }} </strong>
+              </div>
+            </td>
+
+            <td>
+              <span class="email"> {{ employee.empEmail }} </span>
+            </td>
+
+            <td>
+              <span class="department"> {{ employee.empDepartment }} </span>
+            </td>
+
+            <td>
+              <strong> ₹{{ employee.empSalary | number:'1.0-0' }} </strong>
+            </td>
+
+            <td>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="action-button edit-button"
+                  [routerLink]="['/employees/edit', employee.empId]"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="action-button delete-button"
+                  (click)="deleteEmployee(employee)"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  }
+</div>
