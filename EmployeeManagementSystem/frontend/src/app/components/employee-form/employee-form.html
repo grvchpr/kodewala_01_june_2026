@@ -1,171 +1,92 @@
-<form
-  class="employee-form"
-  (ngSubmit)="saveEmployee()"
-  novalidate
->
+<form class="employee-form" (ngSubmit)="saveEmployee()" novalidate>
 
-  <!-- ERROR MESSAGE -->
+	@if (errorMessage) {
 
-  @if (errorMessage) {
+	<div class="error-message">{{ errorMessage }}</div>
 
-    <div class="error-message">
-      {{ errorMessage }}
-    </div>
-
-  }
+	}
 
 
-  <!-- EMPLOYEE NAME -->
+	<!-- EMPLOYEE NAME -->
 
-  <div class="form-group">
+	<div class="form-group">
 
-    <label for="empName">
-      Employee Name
-    </label>
+		<label for="empName"> Employee Name </label> <input id="empName"
+			type="text" name="empName" [(ngModel)]="employee.empName"
+			(blur)="nameTouched = true" placeholder="Enter employee name" />
 
-    <input
-      id="empName"
-      type="text"
-      name="empName"
-      [(ngModel)]="employee.empName"
-      [value]="employee.empName"
-      (blur)="nameTouched = true"
-      placeholder="Enter employee name"
-    />
+		@if (isNameInvalid()) {
 
-    @if (isNameInvalid()) {
+		<div class="field-error">Employee name is required.</div>
 
-      <div class="field-error">
-        Employee name is required.
-      </div>
+		}
 
-    }
-
-  </div>
+	</div>
 
 
-  <!-- EMAIL -->
+	<!-- EMAIL -->
 
-  <div class="form-group">
+	<div class="form-group">
 
-    <label for="empEmail">
-      Email
-    </label>
+		<label for="empEmail"> Email </label> <input id="empEmail"
+			type="email" name="empEmail" [(ngModel)]="employee.empEmail"
+			(blur)="emailTouched = true" placeholder="Enter email" /> @if
+		(isEmailInvalid()) {
 
-    <input
-      id="empEmail"
-      type="email"
-      name="empEmail"
-      [(ngModel)]="employee.empEmail"
-       [value]="employee.empEmail"
-      (blur)="emailTouched = true"
-      placeholder="Enter email"
-    />
+		<div class="field-error">Please enter a valid email address.</div>
 
-    @if (isEmailInvalid()) {
+		}
 
-      <div class="field-error">
-        Please enter a valid email address.
-      </div>
-
-    }
-
-  </div>
+	</div>
 
 
-  <!-- DEPARTMENT -->
+	<!-- DEPARTMENT -->
 
-  <div class="form-group">
+	<div class="form-group">
 
-    <label for="empDepartment">
-      Department
-    </label>
+		<label for="empDepartment"> Department </label> <input
+			id="empDepartment" type="text" name="empDepartment"
+			[(ngModel)]="employee.empDepartment"
+			(blur)="departmentTouched = true" placeholder="Enter department" />
 
-    <input
-      id="empDepartment"
-      type="text"
-      name="empDepartment"
-      [(ngModel)]="employee.empDepartment"
-      [value]="employee.empDepartment"
-      (blur)="departmentTouched = true"
-      placeholder="Enter department"
-    />
+		@if (isDepartmentInvalid()) {
 
-    @if (isDepartmentInvalid()) {
+		<div class="field-error">Department is required.</div>
 
-      <div class="field-error">
-        Department is required.
-      </div>
+		}
 
-    }
-
-  </div>
+	</div>
 
 
-  <!-- SALARY -->
+	<!-- SALARY -->
 
-  <div class="form-group">
+	<div class="form-group">
 
-    <label for="empSalary">
-      Salary
-    </label>
+		<label for="empSalary"> Salary </label> <input id="empSalary"
+			type="number" name="empSalary" [(ngModel)]="employee.empSalary"
+			(blur)="salaryTouched = true" min="1" /> @if (isSalaryInvalid())
+		{
 
-    <input
-      id="empSalary"
-      type="number"
-      name="empSalary"
-      [(ngModel)]="employee.empSalary"
-      [value]="employee.empSalary"
-      (blur)="salaryTouched = true"
-      min="1"
-    />
+		<div class="field-error">Salary must be greater than 0.</div>
 
-    @if (isSalaryInvalid()) {
+		}
 
-      <div class="field-error">
-        Salary must be greater than 0.
-      </div>
-
-    }
-
-  </div>
+	</div>
 
 
-  <!-- BUTTONS -->
+	<!-- BUTTONS -->
 
-  <div class="form-actions">
+	<div class="form-actions">
 
-    <button
-      type="button"
-      class="cancel-button"
-      (click)="cancelForm()"
-      [disabled]="isSaving"
-    >
-      Cancel
-    </button>
+		<button type="button" class="cancel-button" (click)="cancelForm()"
+			[disabled]="isSaving">Cancel</button>
 
 
-    <button
-      type="submit"
-      class="save-button"
-      [disabled]="isSaving"
-    >
+		<button type="submit" class="save-button" [disabled]="isSaving">
 
-      @if (isSaving) {
+			@if (isSaving) { Saving... } @else { {{ isEditMode ? 'Update
+			Employee' : 'Save Employee' }} }</button>
 
-        Saving...
-
-      } @else {
-
-        {{ isEditMode
-            ? 'Update Employee'
-            : 'Save Employee'
-        }}
-
-      }
-
-    </button>
-
-  </div>
+	</div>
 
 </form>

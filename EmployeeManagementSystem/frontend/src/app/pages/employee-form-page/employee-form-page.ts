@@ -1,9 +1,19 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  inject
+} from '@angular/core';
+
+import {
+  ActivatedRoute,
+  Router
+} from '@angular/router';
 
 import { Employee } from '../../models/employee';
 import { EmployeeService } from '../../services/employee.service';
 import { EmployeeForm } from '../../components/employee-form/employee-form';
+
 
 @Component({
   selector: 'app-employee-form-page',
@@ -25,13 +35,20 @@ export class EmployeeFormPage implements OnInit {
   private readonly employeeService =
     inject(EmployeeService);
 
+  private readonly cdr =
+    inject(ChangeDetectorRef);
+
 
   ngOnInit(): void {
 
     const employeeId =
       this.route.snapshot.paramMap.get('id');
 
-    console.log('URL employee ID:', employeeId);
+
+    console.log(
+      'URL employee ID:',
+      employeeId
+    );
 
 
     // ==========================================
@@ -40,11 +57,15 @@ export class EmployeeFormPage implements OnInit {
 
     if (!employeeId) {
 
-      console.log('Add employee mode');
+      console.log(
+        'Add employee mode'
+      );
 
       this.isEditMode = false;
 
       this.employeeToEdit = null;
+
+      this.cdr.detectChanges();
 
       return;
     }
@@ -56,7 +77,9 @@ export class EmployeeFormPage implements OnInit {
 
     this.isEditMode = true;
 
-    console.log('Edit employee mode');
+    console.log(
+      'Edit employee mode'
+    );
 
 
     this.employeeService
@@ -73,7 +96,9 @@ export class EmployeeFormPage implements OnInit {
 
           const employee =
             employees.find(
-              e => String(e.empId) === String(employeeId)
+              e =>
+                Number(e.empId) ===
+                Number(employeeId)
             );
 
 
@@ -89,15 +114,21 @@ export class EmployeeFormPage implements OnInit {
               ...employee
             };
 
+
             console.log(
               'employeeToEdit:',
               this.employeeToEdit
             );
 
+
+            // IMPORTANT:
+            // Force Angular to refresh the view
+            this.cdr.detectChanges();
+
           } else {
 
             console.error(
-              'Employee not found for ID:',
+              'Employee not found:',
               employeeId
             );
 
@@ -113,7 +144,7 @@ export class EmployeeFormPage implements OnInit {
         error: (error) => {
 
           console.error(
-            'Unable to load employees:',
+            'Unable to load employee:',
             error
           );
 

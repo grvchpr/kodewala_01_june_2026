@@ -1,255 +1,426 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  inject
+} from '@angular/core';
+
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { Employee } from '../../models/employee';
 import { EmployeeService } from '../../services/employee.service';
 
+
 @Component({
   selector: 'app-employee-list',
   standalone: true,
+
   imports: [
     DecimalPipe,
     FormsModule,
     RouterLink
   ],
+
   templateUrl: './employee-list.html',
+
   styleUrl: './employee-list.css'
 })
 export class EmployeeList implements OnInit {
+
+
+  // =========================================================
+  // DATA
+  // =========================================================
 
   employees: Employee[] = [];
 
   filteredEmployees: Employee[] = [];
 
+
+  // =========================================================
+  // SEARCH
+  // =========================================================
+
   searchText = '';
+
+
+  // =========================================================
+  // DEPARTMENT
+  // =========================================================
 
   selectedDepartment = 'All';
 
-  salarySort: 'default' | 'asc' | 'desc' = 'default';
-
   departments: string[] = [];
 
-  showForm = false;
 
-  employeeToEdit: Employee | null = null;
+  // =========================================================
+  // SALARY SORT
+  // =========================================================
+
+  salarySort: 'default' | 'asc' | 'desc' = 'default';
+
+
+  // =========================================================
+  // UI STATE
+  // =========================================================
 
   isLoading = false;
 
   errorMessage = '';
 
-  private readonly employeeService = inject(EmployeeService);
+
+  // =========================================================
+  // SERVICES
+  // =========================================================
+
+  private readonly employeeService =
+    inject(EmployeeService);
+
+  private readonly router =
+    inject(Router);
+
+  private readonly cdr =
+    inject(ChangeDetectorRef);
+
+
+  // =========================================================
+  // INIT
+  // =========================================================
 
   ngOnInit(): void {
+
     this.loadEmployees();
+
   }
+
+
+  // =========================================================
+  // LOAD EMPLOYEES
+  // =========================================================
 
   loadEmployees(): void {
 
-  this.isLoading = true;
-  this.errorMessage = '';
+    console.log('Loading employees...');
 
-  this.employeeService.getAllEmployees().subscribe({
+    this.isLoading = true;
 
-    next: (data) => {
+    this.errorMessage = '';
 
-      this.employees = data;
+    this.cdr.detectChanges();
 
-      this.departments = [
-        ...new Set(
-          data.map(employee => employee.empDepartment)
-        )
-      ].sort();
 
-      this.applyFilters();
+    this.employeeService
+      .getAllEmployees()
+      .subscribe({
 
-      this.isLoading = false;
-    },
+        next: (data: Employee[]) => {
 
-    error: (error) => {
+          console.log(
+            'Employees received from API:',
+            data
+          );
 
-      console.error('Error loading employees:', error);
 
-      this.isLoading = false;
+          // Store employees
 
-      this.errorMessage =
-        'Unable to load employees. Please try again.';
-    }
+          this.employees = data ?? [];
 
-  });
-}
 
-  applyFilters(): void {
+          // Create departments
 
-    const search = this.searchText
-      .trim()
-      .toLowerCase();
+          this.departments = [
+            ...new Set(
+              this.employees
+                .map(
+                  employee =>
+                    employee.empDepartment
+                )
+            )
+          ].sort();
 
-    let result = [...this.employees];
 
-    // Search
-    if (search) {
+          // Apply search/filter/sort
 
-      result = result.filter(employee =>
+          this.applyFilters();
 
-        employee.empName
-          .toLowerCase()
-          .includes(search)
 
-        ||
+          // IMPORTANT
+          // Stop loading AFTER data is ready
 
-        employee.empEmail
-          .toLowerCase()
-          .includes(search)
+          this.isLoading = false;
 
-        ||
 
-        employee.empDepartment
-          .toLowerCase()
-          .includes(search)
+          console.log(
+            'isLoading:',
+            this.isLoading
+          );
 
-      );
+          console.log(
+            'filteredEmployees:',
+            this.filteredEmployees
+          );
 
-    }
 
-    // Department filter
-    if (this.selectedDepartment !== 'All') {
+          // Force Angular UI update
 
-      result = result.filter(
-        employee =>
-          employee.empDepartment === this.selectedDepartment
-      );
+          this.cdr.detectChanges();
 
-    }
+        },
 
-    // Salary sorting
-    if (this.salarySort === 'asc') {
 
-      result.sort(
-        (a, b) => a.empSalary - b.empSalary
-      );
+        error: (error) => {
 
-    } else if (this.salarySort === 'desc') {
+          console.error(
+            'Error loading employees:',
+            error
+          );
 
-      result.sort(
-        (a, b) => b.empSalary - a.empSalary
-      );
 
-    }
+          this.isLoading = false;
 
-    this.filteredEmployees = result;
+          this.errorMessage =
+            'Unable to load employees. Please try again.';
+
+
+          // Force UI update
+
+          this.cdr.detectChanges();
+
+        }
+
+      });
+
   }
+
+
+  // =========================================================
+  // ADD EMPLOYEE
+  // =========================================================
+
+  openAddEmployee(): void {
+
+    this.router.navigate([
+      '/employees/add'
+    ]);
+
+  }
+
+
+  // =========================================================
+  // SEARCH EMPLOYEES
+  // =========================================================
 
   searchEmployees(): void {
+
     this.applyFilters();
+
   }
+
+
+  // =========================================================
+  // DEPARTMENT FILTER
+  // =========================================================
 
   filterByDepartment(): void {
+
     this.applyFilters();
+
   }
 
-  retryLoadEmployees(): void{
-    this.loadEmployees();
-  }
+
+  // =========================================================
+  // SALARY SORT
+  // =========================================================
 
   sortBySalary(): void {
 
-    if (this.salarySort === 'default') {
+    if (
+      this.salarySort === 'default'
+    ) {
 
       this.salarySort = 'asc';
 
-    } else if (this.salarySort === 'asc') {
+    }
+
+    else if (
+      this.salarySort === 'asc'
+    ) {
 
       this.salarySort = 'desc';
 
-    } else {
+    }
+
+    else {
 
       this.salarySort = 'default';
 
     }
 
-    this.applyFilters();
-  }
-
-  openAddEmployee(): void {
-
-    this.employeeToEdit = null;
-
-    this.showForm = true;
-
-  }
-
-  openEditEmployee(employee: Employee): void {
-
-    this.employeeToEdit = { ...employee };
-
-    this.showForm = true;
-
-  }
-
-  closeForm(): void {
-
-    this.showForm = false;
-
-    this.employeeToEdit = null;
-
-  }
-
-  onEmployeeCreated(employee: Employee): void {
-
-    this.employees.push(employee);
-
-    this.departments = [
-      ...new Set(
-        this.employees.map(e => e.empDepartment)
-      )
-    ].sort();
 
     this.applyFilters();
 
-    this.closeForm();
-
   }
 
-  onEmployeeUpdated(updatedEmployee: Employee): void {
 
-    const index = this.employees.findIndex(
-      employee =>
-        employee.empId === updatedEmployee.empId
-    );
+  // =========================================================
+  // APPLY FILTERS
+  // =========================================================
 
-    if (index !== -1) {
+  applyFilters(): void {
 
-      this.employees[index] = updatedEmployee;
+    const search =
+      this.searchText
+        .trim()
+        .toLowerCase();
+
+
+    let result: Employee[] = [
+      ...this.employees
+    ];
+
+
+    // -------------------------------------------------------
+    // SEARCH
+    // -------------------------------------------------------
+
+    if (search) {
+
+      result = result.filter(
+        employee => {
+
+          const name =
+            employee.empName
+              ?.toLowerCase() ?? '';
+
+          const email =
+            employee.empEmail
+              ?.toLowerCase() ?? '';
+
+          const department =
+            employee.empDepartment
+              ?.toLowerCase() ?? '';
+
+
+          return (
+
+            name.includes(search) ||
+
+            email.includes(search) ||
+
+            department.includes(search)
+
+          );
+
+        }
+      );
 
     }
 
-    this.departments = [
-      ...new Set(
-        this.employees.map(e => e.empDepartment)
-      )
-    ].sort();
 
-    this.applyFilters();
+    // -------------------------------------------------------
+    // DEPARTMENT
+    // -------------------------------------------------------
 
-    this.closeForm();
+    if (
+      this.selectedDepartment !== 'All'
+    ) {
+
+      result = result.filter(
+        employee =>
+          employee.empDepartment ===
+          this.selectedDepartment
+      );
+
+    }
+
+
+    // -------------------------------------------------------
+    // SALARY SORT
+    // -------------------------------------------------------
+
+    if (
+      this.salarySort === 'asc'
+    ) {
+
+      result.sort(
+        (a, b) =>
+          Number(a.empSalary) -
+          Number(b.empSalary)
+      );
+
+    }
+
+    else if (
+      this.salarySort === 'desc'
+    ) {
+
+      result.sort(
+        (a, b) =>
+          Number(b.empSalary) -
+          Number(a.empSalary)
+      );
+
+    }
+
+
+    // -------------------------------------------------------
+    // FINAL RESULT
+    // -------------------------------------------------------
+
+    this.filteredEmployees = result;
+
+
+    console.log(
+      'Filtered employees:',
+      this.filteredEmployees
+    );
 
   }
 
-  deleteEmployee(employee: Employee): void {
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${employee.empName}?`
-    );
+  // =========================================================
+  // RETRY
+  // =========================================================
+
+  retryLoadEmployees(): void {
+
+    this.loadEmployees();
+
+  }
+
+
+  // =========================================================
+  // DELETE EMPLOYEE
+  // =========================================================
+
+  deleteEmployee(
+    employee: Employee
+  ): void {
+
+
+    const confirmed =
+      window.confirm(
+        `Are you sure you want to delete ${employee.empName}?`
+      );
+
 
     if (!confirmed) {
+
       return;
+
     }
 
-    if (employee.empId === undefined) {
+
+    if (
+      employee.empId === undefined
+    ) {
+
       return;
+
     }
+
 
     this.employeeService
       .deleteEmployee(employee.empId)
@@ -257,19 +428,46 @@ export class EmployeeList implements OnInit {
 
         next: () => {
 
-          this.employees = this.employees.filter(
-            e => e.empId !== employee.empId
+          console.log(
+            'Employee deleted:',
+            employee
           );
+
+
+          // Remove employee
+
+          this.employees =
+            this.employees.filter(
+              e =>
+                e.empId !==
+                employee.empId
+            );
+
+
+          // Rebuild departments
 
           this.departments = [
             ...new Set(
-              this.employees.map(e => e.empDepartment)
+              this.employees
+                .map(
+                  e =>
+                    e.empDepartment
+                )
             )
           ].sort();
 
+
+          // Reapply filters
+
           this.applyFilters();
 
+
+          // Refresh UI
+
+          this.cdr.detectChanges();
+
         },
+
 
         error: (error) => {
 
@@ -277,6 +475,7 @@ export class EmployeeList implements OnInit {
             'Error deleting employee:',
             error
           );
+
 
           alert(
             'Unable to delete employee. Please try again.'
@@ -287,4 +486,5 @@ export class EmployeeList implements OnInit {
       });
 
   }
+
 }

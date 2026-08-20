@@ -5,12 +5,8 @@
     <div class="form-header">
 
       <h1>
-        {{ isEditMode
-            ? 'Edit Employee'
-            : 'Add Employee'
-        }}
+        {{ isEditMode ? 'Edit Employee' : 'Add Employee' }}
       </h1>
-
 
       <button
         type="button"
@@ -23,21 +19,30 @@
     </div>
 
 
-    <app-employee-form
+    <!-- EDIT MODE: WAIT FOR EMPLOYEE -->
 
-      [employeeToEdit]="employeeToEdit"
+    @if (isEditMode && !employeeToEdit) {
 
-      (employeeCreated)="
-        onEmployeeCreated($event)
-      "
+      <div class="loading-message">
+        Loading employee...
+      </div>
 
-      (employeeUpdated)="
-        onEmployeeUpdated($event)
-      "
+    }
 
-      (cancel)="cancel()">
 
-    </app-employee-form>
+    <!-- FORM -->
+
+    @if (!isEditMode || employeeToEdit) {
+
+      <app-employee-form
+        [employeeToEdit]="employeeToEdit"
+        (employeeCreated)="onEmployeeCreated($event)"
+        (employeeUpdated)="onEmployeeUpdated($event)"
+        (cancel)="cancel()"
+      >
+      </app-employee-form>
+
+    }
 
   </div>
 
