@@ -1,41 +1,18 @@
 package com.kodewala.set1;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
-class Payment implements Comparable<Payment> {
-	String refID;
-
-	public Payment(String refID) {
-		super();
-		this.refID = refID;
-	}
-
-	public int compareTo(Payment p) {
-		int result = this.refID.compareTo(p.refID);
-		return result;
-	}
-}
+import java.util.HashSet;
 
 public class Driver {
 	public static void main(String[] args) {
-		Set<Payment> set = new TreeSet<Payment>();
+		HashSet<String> products = new HashSet<>();
+		products.add("iPhone17");
+		products.add("samsuns26");
+		products.add("lg32");
+		products.add("mac-pro324");
 
-		Payment p1 = new Payment("ABCD");
-		Payment p2 = new Payment("VCNB");
-		Payment p3 = new Payment("XVBD");
-		Payment p4 = new Payment("NVFJ");
-
-		set.add(p1);
-		set.add(p2);
-		set.add(p3);
-		set.add(p4);
-
-		Iterator<Payment> it = set.iterator();
-		while (it.hasNext()) {
-			Payment p = it.next();
-			System.out.println(p.refID);
-		}
+		int hash = "iPhone17".hashCode();
+		int spreadHash = hash ^ (hash >>> 16);
+		int index = spreadHash & (16 - 1);
+		System.out.println("index: " + index);
 	}
 }
